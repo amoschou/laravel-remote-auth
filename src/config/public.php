@@ -1,8 +1,6 @@
 <?php
 
-use AMoschou\RemoteAuth\App\Drivers\{
-    Ldap,
-};
+use AMoschou\RemoteAuth\App\Drivers\Ldap;
 
 return [
 
