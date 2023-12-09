@@ -27,7 +27,7 @@ Authentication provided by a remote server for Laravel apps.
 
    use AMoschou\RemoteAuth\App\Models\User as RemoteAuthUser;
 
-   class User extends RemoteAuthUser {}
+   class User extends RemoteAuthUser
    {
        //
    }
