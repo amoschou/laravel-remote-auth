@@ -55,7 +55,7 @@ abstract class Driver
         return $auth;
     }
 
-    private static function getOrderedList(): array
+    public static function getOrderedList(): array
     {
         $default = [config('remote_auth.default')];
 

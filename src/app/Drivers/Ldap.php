@@ -3,8 +3,6 @@
 namespace AMoschou\RemoteAuth\App\Drivers;
 
 use AMoschou\RemoteAuth\App\Support\Ldap as LdapSupport;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class Ldap extends Driver
 {

@@ -33,7 +33,8 @@ class LoginController extends Controller
         // Get fresh details about the user. This will be used to update the
         // record in the the users table. Remember, there is no need to record
         // anything to do with the password in the database because this is not
-        // where credentials are checked.
+        // where credentials are checked. However, the hashed password would
+        // need to be stored to make use of the 'db' driver.
 
         $this->login($validated['username'], $validated['password'], $validated['remember_me'] ?? false);
 
@@ -110,7 +111,20 @@ class LoginController extends Controller
         return redirect(config('remote_auth.redirect.after_logout'));
     }
 
-    private function getUser($username, $password) {
-        return Driver::use()->getUser($username, $password);
+    private function getUser($username, $password)
+    {
+        $drivers = Driver::getOrderedList();
+
+        $successfulResult = null;
+
+        foreach($drivers as $driver) {
+            try {
+                if (is_null($successfulResult)) {
+                    $successfulResult = Driver::select($driver)->getUser($username, $password);
+                }
+            } catch (\Throwable $t) {}
+        }
+
+        return $successfulResult;
     }
 }

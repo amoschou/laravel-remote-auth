@@ -32,16 +32,22 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         if ($password === '' || $username === '' || is_null($username) || is_null($password)) {
             $fail('No anonymous logins allowed.');
         } else {
-            $driver = Driver::select();
+            $drivers = Driver::getOrderedList();
 
-            if (is_null($driver)) {
-                $fail('No log in service currently available, try again later.');
+            $successfulDriver = null;
+
+            foreach($drivers as $driver) {
+                try {
+                    if (is_null($successfulDriver)) {
+                        if (Driver::select($driver)->validate($username, $password)) {
+                            $successfulDriver = $driver;
+                        }
+                    }
+                } catch (\Throwable $t) {}
             }
 
-            $success = Driver::select($driver)->validate($username, $password);
-
-            if (! $success) {
-                $fail('Invalid username and/or password.');
+            if (is_null($successfulDriver)) {
+                $fail('Unable to log in using this username/password at this time.');
             }
         }
     }
