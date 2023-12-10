@@ -82,14 +82,19 @@ The DB driver is designed to be used as a backup, in case the LDAP (or other ext
    </form>
    ```
 
-6. Typically, you will need a route to show this form, and route to receive the login request. In this setup, we also need a dashboard route to redirect requests to after logging in, and a log out route. You will need to use the `authenticate` and `logout` methods on `LoginController`, but generally, you are free to design your routes and views as you like.
+6. Typically, you will need a route to show this form, and route to receive the login request. In this setup, we also need a home route to redirect requests to after logging in, and a log out route. You will need to use the `authenticate` and `logout` methods on `LoginController`, but generally, you are free to design your routes and views as you like.
    ```
    use AMoschou\RemoteAuth\App\Http\Controllers\LoginController;
 
-   Route::get('/login', function () { return view('vendor.laravel-remote-auth.login'); });
-   Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
-   Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-   Route::get('/dashboard', function () { return view('dashboard'); })->middleware('auth')->name('dashboard');
+   Route::middleware('guest')->group(function () {
+       Route::get('/login', function () { return view('vendor.laravel-remote-auth.login'); })->name('login');
+       Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
+   });
+
+   Route::middleware('auth')->group(function () {
+       Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+       Route::get('/home', function () { return view('home'); })->name('home');
+   });
    ```
 
 ### Other drivers

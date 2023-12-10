@@ -4,6 +4,7 @@ use AMoschou\RemoteAuth\App\Drivers\{
     Db,
     Ldap,
 };
+use App\Providers\RouteServiceProvider;
 
 return [
 
@@ -52,7 +53,7 @@ return [
     */
 
     'redirect' => [
-        'after_login_fallback' => 'dashboard',
+        'after_login_fallback' => RouteServiceProvider::HOME,
         'after_logout' => '/',
     ],
 
