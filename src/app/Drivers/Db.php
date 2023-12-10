@@ -3,6 +3,7 @@
 namespace AMoschou\RemoteAuth\App\Drivers;
 
 use AMoschou\RemoteAuth\App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class Db extends Driver
 {

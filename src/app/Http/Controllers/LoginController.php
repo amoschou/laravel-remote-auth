@@ -111,7 +111,20 @@ class LoginController extends Controller
         return redirect(config('remote_auth.redirect.after_logout'));
     }
 
-    private function getUser($username, $password) {
-        return Driver::use()->getUser($username, $password);
+    private function getUser($username, $password)
+    {
+        $drivers = Driver::getOrderedList();
+
+        $successfulResult = null;
+
+        foreach($drivers as $driver) {
+            try {
+                if (is_null($successfulResult)) {
+                    $successfulResult = Driver::select($driver)->getUser($username, $password);
+                }
+            } catch (\Throwable $t) {}
+        }
+
+        return $successfulResult;
     }
 }
