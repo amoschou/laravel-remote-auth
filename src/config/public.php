@@ -1,6 +1,9 @@
 <?php
 
-use AMoschou\RemoteAuth\App\Drivers\Ldap;
+use AMoschou\RemoteAuth\App\Drivers\{
+    Db,
+    Ldap,
+};
 
 return [
 
@@ -17,9 +20,15 @@ return [
 
     'default' => 'ldap',
 
-    'preferences' => [],
+    'preferences' => [
+        'db',
+    ],
 
     'drivers' => [
+
+        'db' => [
+            'class' => Db::class,
+        ],
 
         'ldap' => [
             'connection' => env('REMOTE_AUTH_LDAP', 'ldaps://ad.subdomain.example.com'),

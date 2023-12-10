@@ -2,6 +2,22 @@
 
 Authentication provided by a remote server for Laravel apps.
 
+## User registration and processes
+
+This package assumes that the only users who are authorised to use the app are already registered in the remote server. This is true if your organisation already uses LDAP, for example. There is no need for a separate user registration process.
+
+Likewise, there are no ‘reset password’ or ‘change username/name/email’ processes. To achieve this, users need to use your organisation’s existing procedures.
+
+## Drivers
+
+This package provides two drivers:
+* LDAP (This requires the LDAP extension in PHP)
+* DB
+
+The LDAP driver is appropriate if your organisation already uses an LDAP server. Users submit their username and password, and these are used to attempt authentication to the LDAP server. The app receives the result of this attempt as success or fail. If successful, a second request is also made to receive information about the user which includes their name, email address and ID number, and this information is stored in the app’s database. If this information has been changed on the LDAP server since the previous login, updates will be reflected in the app. The user’s hashed password is also stored in the database. Usually, this would not be used, but it is necessary for the DB driver to work.
+
+The DB driver is designed to be used as a backup, in case the LDAP (or other external) server is unavailable. Users submit their username and password, and these are checked in the app’s database like a traditional username/password system. As this requires the hashed password to exist in the database, a user must have logged in at some point previously using the external server driver. As the external server is unavailable at this login session, any changes which might exist about the user (name, email, etc) will not be reflected in the app.
+
 ## Getting started
 
 1. For a newish Laravel application, install by running:
@@ -75,15 +91,10 @@ Authentication provided by a remote server for Laravel apps.
    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
    Route::get('/dashboard', function () { return view('dashboard'); })->middleware('auth')->name('dashboard');
    ```
-## Drivers
-
-### LDAP
-
-This package comes with one driver for `LDAP` authentication. Internally, PHP uses its [LDAP functions](https://www.php.net/manual/en/ref.ldap.php) to achieve this.
 
 ### Other drivers
 
-To install a new driver, create a new class that extends `AMoschou\RemoteAuth\App\Drivers\Driver`. It will need to implement the following functions `validate($username, $password)` and `getUser($username, $password)` and set a key:
+To install a new driver, create a new class that extends `AMoschou\RemoteAuth\App\Drivers\Driver`. It will need to implement the following functions `validate($username, $password)` and `getUser($username, $password)` and set a short string to identify the driver:
 ```
 <?php
 
@@ -123,12 +134,13 @@ Edit `conf/remote_auth.php`, to reference the new driver including the class you
 
 'preferences' => [
     'new-auth',
+    'db',
 ],
 
 'drivers' => [
-    'ldap' => [
-        ...
-    ],
+    'db' => [ ... ],
+
+    'ldap' => [ ... ],
 
     'new-auth' => [
         ...

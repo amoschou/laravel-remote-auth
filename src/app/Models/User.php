@@ -80,4 +80,22 @@ class User extends Authenticatable
             ->where('group', $group)
             ->exists();
     }
+
+    public function getAboutUser()
+    {
+        $groups = DB::table('remote_auth_memberships')
+            ->where('username', $this->username)
+            ->pluck('group')
+            ->toArray();
+
+        return [
+            'username' => $this->username,
+            'last_name' => $this->last_name,
+            'first_name' => $this->first_name,
+            'display_name' => $this->display_name,
+            'id' => $this->id,
+            'email' => $this->email,
+            'groups' => $groups,
+        ];
+    }
 }

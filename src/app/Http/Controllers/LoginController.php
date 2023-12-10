@@ -33,7 +33,8 @@ class LoginController extends Controller
         // Get fresh details about the user. This will be used to update the
         // record in the the users table. Remember, there is no need to record
         // anything to do with the password in the database because this is not
-        // where credentials are checked.
+        // where credentials are checked. However, the hashed password would
+        // need to be stored to make use of the 'db' driver.
 
         $this->login($validated['username'], $validated['password'], $validated['remember_me'] ?? false);
 
