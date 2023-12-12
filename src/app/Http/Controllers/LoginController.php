@@ -52,12 +52,11 @@ class LoginController extends Controller
         // insert into the memberships table.
 
         $user = DB::transaction(function () use ($aboutUser) {
-            $username = $aboutUser['username'];
+            $username = strtolower($aboutUser['username']);
 
             $groups = $aboutUser['groups'];
 
             $freshRecord = [
-                'username' => $username,
                 'id' => $aboutUser['id'],
                 'display_name' => $aboutUser['display_name'],
                 'email' => $aboutUser['email'],
@@ -73,13 +72,34 @@ class LoginController extends Controller
                     'group' => $group,
                 ];
             }
+
+            $user = User::findOr($username, function () use ($username, $freshRecord) {
+                $user = new User;
+
+                $user->username = $username;
+                $user->id = $freshRecord['id'];
+                $user->display_name = $freshRecord['display_name'];
+                $user->email = $freshRecord['email'];
+                $user->last_name = $freshRecord['last_name'];
+                $user->first_name = $freshRecord['first_name'];
+
+                $user->save();
+
+                return $user;
+            });
             
-            $user = User::firstOrCreate([
-                'username' => $username
-            ], $freshRecord);
+            // $user = User::firstOrCreate([
+            //     'username' => $username
+            // ], $freshRecord);
     
-            $user->update($freshRecord);
+            // // $user->update($freshRecord);
     
+            $user->id = $freshRecord['id'];
+            $user->display_name = $freshRecord['display_name'];
+            $user->email = $freshRecord['email'];
+            $user->last_name = $freshRecord['last_name'];
+            $user->first_name = $freshRecord['first_name'];
+
             if ($user->isDirty()) {
                 $user->save();
             }

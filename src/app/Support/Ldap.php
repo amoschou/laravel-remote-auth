@@ -94,7 +94,7 @@ class Ldap
 
         $search = ldap_search(
             $this->getConnection(),
-            config('remote_auth.organisation'),
+            config('remote_auth.drivers.ldap.organisation'),
             $filter,
             self::$justthese
         );
@@ -126,6 +126,14 @@ class Ldap
             }
         }
 
+        $groups = [];
+
+        foreach ($easyResults['memberof'] as $group) {
+            $check = ldap_explode_dn($group, 1)[0];
+
+            $groups[] = $check === false ? $group : $check;
+        }
+
         $this->aboutUser = [
             'username' => $easyResults['samaccountname'],
             'last_name' => $easyResults['sn'],
@@ -133,7 +141,7 @@ class Ldap
             'display_name' => $easyResults['displayname'],
             'id' => $easyResults['telephonenumber'] ?? null,
             'email' => $easyResults['mail'] ?? null,
-            'groups' => $easyResults['memberof'],
+            'groups' => $groups,
         ];
 
         return $this;
