@@ -28,13 +28,17 @@ class Ldap
     {
         $this->username = $username;
 
+        $domain = config('remote_auth.drivers.ldap.domain');
+
+        $this->getPrincipalName = "{$username}@{$domain}";
+
         return $this;
     }
 
     private function getConnection()
     {
         if (is_null($this->connection)) {
-            $this->connection = ldap_connect(config('remote_auth.ldap'));
+            $this->connection = ldap_connect(config('remote_auth.drivers.ldap.connection'));
 
             $this->invalidCredentials = false;
         }
