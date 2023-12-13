@@ -30,7 +30,7 @@ class Ldap
 
         $domain = config('remote_auth.drivers.ldap.domain');
 
-        $this->getPrincipalName = "{$username}@{$domain}";
+        $this->userPrincipalName = "{$username}@{$domain}";
 
         return $this;
     }
