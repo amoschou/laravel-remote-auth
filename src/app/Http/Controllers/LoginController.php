@@ -22,14 +22,15 @@ class LoginController extends Controller
      */
     public function authenticate(Request $request): RedirectResponse
     {
+        // RemoteAuthRule requires a validated username and password to work.
+        // This is why we validate these separately first. The username and
+        // password are required to determine the successful driver. Then,
+        // we store the successful driver in $this->driver. Then we continue
+        // with validation and log in.
+
         $formCredentials = [
             'username' => $request->input('username'),
             'password' => $request->input('password'),
-        ];
-
-        $formOthers = [
-            'remember_me' => $request->input('remember_me'),
-            'hidden' => $request->input('hidden'),
         ];
 
         $formCredentialsValidator = Validator::make($formCredentials, [
@@ -45,14 +46,16 @@ class LoginController extends Controller
 
         $this->driver = $remoteAuthRule->getDriver($formCredentialsValidated);
 
-        $formOthersValidator = Validator::make($formOthers, [
+        $validator = Validator::make($request->all(), [
+            'username' => 'required',
+            'password' => 'required',
             'remember_me' => 'sometimes|in:on',
             'hidden' => $remoteAuthRule,
         ]);
 
-        $formOthersValidator->validated();
+        $validator->validated();
     
-        $formOthersValidated = $formOthersValidator->safe()->only('remember_me');
+        $validated = $validator->safe()->only('username', 'password', 'remember_me');
 
         // Get fresh details about the user. This will be used to update the
         // record in the the users table. Remember, there is no need to record
@@ -61,9 +64,9 @@ class LoginController extends Controller
         // need to be stored to make use of the 'db' driver.
 
         $this->login(
-            $formCredentialsValidated['username'],
-            $formCredentialsValidated['password'],
-            $formOthersValidated['remember_me'] ?? false
+            $validated['username'],
+            $validated['password'],
+            $validated['remember_me'] ?? false
         );
 
         $request->session()->regenerate();
