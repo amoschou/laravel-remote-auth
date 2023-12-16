@@ -31,10 +31,15 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
 
         $password = $this->data['password'];
 
+        $credentials = [
+            'username' => $username,
+            'password' => $password,
+        ];
+
         if ($password === '' || $username === '' || is_null($username) || is_null($password)) {
             $fail('No anonymous logins allowed.');
         } else {
-            if (is_null($this->getDriver())) {
+            if (is_null($this->getDriver($credentials))) {
                 $fail('Unable to log in using this username/password at this time.');
             }
         }
