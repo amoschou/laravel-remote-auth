@@ -10,25 +10,49 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
+    private $driver;
+
     /**
      * Handle an authentication attempt.
      */
     public function authenticate(Request $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), [
+        $formCredentials = [
+            'username' => $request->input('username'),
+            'password' => $request->input('password'),
+        ];
+
+        $formOthers = [
+            'remember_me' => $request->input('remember_me'),
+            'hidden' => $request->input('hidden'),
+        ];
+
+        $formCredentialsValidator = Validator::make($formCredentials, [
             'username' => 'required',
             'password' => 'required',
-            'remember_me' => 'sometimes|in:on',
-            'hidden' => new RemoteAuthRule,
         ]);
 
-        $validator->validated();
+        $formCredentialsValidator->validated();
+
+        $formCredentialsValidated = $formCredentialsValidator->safe()->only('username', 'password');
+
+        $remoteAuthRule = new RemoteAuthRule;
+
+        $this->driver = $remoteAuthRule->getDriver($formCredentialsValidated);
+
+        $formOthersValidator = Validator::make($formOthers, [
+            'remember_me' => 'sometimes|in:on',
+            'hidden' => $remoteAuthRule,
+        ]);
+
+        $formOthersValidator->validated();
     
-        $validated = $validator->safe()->only('username', 'password', 'remember_me');
+        $formOthersValidated = $formOthersValidator->safe()->only('remember_me');
 
         // Get fresh details about the user. This will be used to update the
         // record in the the users table. Remember, there is no need to record
@@ -36,7 +60,11 @@ class LoginController extends Controller
         // where credentials are checked. However, the hashed password would
         // need to be stored to make use of the 'db' driver.
 
-        $this->login($validated['username'], $validated['password'], $validated['remember_me'] ?? false);
+        $this->login(
+            $formCredentialsValidated['username'],
+            $formCredentialsValidated['password'],
+            $formOthersValidated['remember_me'] ?? false
+        );
 
         $request->session()->regenerate();
 
@@ -47,11 +75,9 @@ class LoginController extends Controller
     {
         $aboutUser = $this->getUser($username, $password);
 
-        // Find the user in the database. If found, then update the record with
-        // fresh information. But if not found, then insert the record. We also
-        // insert into the memberships table.
+        $hash = Hash::make($password);
 
-        $user = DB::transaction(function () use ($aboutUser) {
+        $user = DB::transaction(function () use ($aboutUser, $hash) {
             $username = strtolower($aboutUser['username']);
 
             $groups = $aboutUser['groups'];
@@ -87,12 +113,6 @@ class LoginController extends Controller
 
                 return $user;
             });
-            
-            // $user = User::firstOrCreate([
-            //     'username' => $username
-            // ], $freshRecord);
-    
-            // // $user->update($freshRecord);
     
             $user->id = $freshRecord['id'];
             $user->display_name = $freshRecord['display_name'];

@@ -10,6 +10,8 @@ abstract class Driver
 
     abstract public function getUser($username, $password): array;
 
+    public $usesHash = false;
+
     public function dnsRecordExists(): bool
     {
         $domain = config("remote_auth.drivers.{$this->driver}.dns");

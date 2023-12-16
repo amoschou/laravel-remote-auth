@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Http;
 
 class RemoteAuthRule implements DataAwareRule, ValidationRule
 {
+    private $driver;
+
     /**
      * All of the data under validation.
      *
@@ -32,21 +34,7 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         if ($password === '' || $username === '' || is_null($username) || is_null($password)) {
             $fail('No anonymous logins allowed.');
         } else {
-            $drivers = Driver::getOrderedList();
-
-            $successfulDriver = null;
-
-            foreach($drivers as $driver) {
-                try {
-                    if (is_null($successfulDriver)) {
-                        if (Driver::select($driver)->validate($username, $password)) {
-                            $successfulDriver = $driver;
-                        }
-                    }
-                } catch (\Throwable $t) {}
-            }
-
-            if (is_null($successfulDriver)) {
+            if (is_null($this->getDriver())) {
                 $fail('Unable to log in using this username/password at this time.');
             }
         }
@@ -62,5 +50,33 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         $this->data = $data;
 
         return $this;
+    }
+
+    private function setDriver($credentials): void
+    {
+        if (is_null($this->driver)) {
+            $drivers = Driver::getOrderedList();
+
+            $successfulDriver = null;
+    
+            foreach($drivers as $driver) {
+                try {
+                    if (is_null($successfulDriver)) {
+                        if (Driver::select($driver)->validate($credentials['username'], $credentials['password'])) {
+                            $successfulDriver = $driver;
+                        }
+                    }
+                } catch (\Throwable $t) {}
+            }
+    
+            $this->driver = $successfulDriver;
+        }
+    }
+
+    public function getDriver($credentials): string|null
+    {
+        $this->setDriver($credentials);
+
+        return $this->driver;
     }
 }

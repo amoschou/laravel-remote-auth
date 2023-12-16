@@ -9,6 +9,8 @@ class Db extends Driver
 {
     public $driver = 'db';
 
+    public $usesHash = true;
+
     public function validate($username, $password): bool
     {
         return Auth::attempt([
