@@ -47,12 +47,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'username',
-        'id',
-        'display_name',
-        'email',
-        'last_name',
-        'first_name',
+        //
     ];
 
     /**
@@ -61,6 +56,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'password',
         'remember_token',
     ];
 
@@ -70,7 +66,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        //
+        'password' => 'hashed',
     ];
 
     public function isMemberOf($group)

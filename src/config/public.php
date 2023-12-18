@@ -1,42 +1,34 @@
 <?php
 
-use AMoschou\RemoteAuth\App\Drivers\{
-    Db,
-    Ldap,
-};
+use AMoschou\RemoteAuth\App\Drivers\Db;
+use AMoschou\RemoteAuth\App\Drivers\Ldap;
 use App\Providers\RouteServiceProvider;
 
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Authentication Driver and Preferences
+    | Authentication Drivers and Settings
     |--------------------------------------------------------------------------
     |
-    | In the first instance, authentication is attempted using the default
-    | driver. In case this fails, each of the backup drivers as listed in
-    | the preferences will be tried in order until one is successful.
+    | Authentication is first attempted using the first driver in the list. In
+    | case this fails, the next is tried and so on until one is successful.
+    | Any setting that a driver may require can be configured as well. 
     |
     */
 
-    'default' => 'ldap',
-
-    'preferences' => [
-        'db',
+    'drivers' => [
+        'ldap' => Ldap::class,
+        'db' => DB::class,
     ],
 
-    'drivers' => [
-
-        'db' => [
-            'class' => Db::class,
-        ],
+    'settings' => [
 
         'ldap' => [
             'connection' => env('REMOTE_AUTH_LDAP', 'ldaps://ad.subdomain.example.com'),
             'domain' => env('REMOTE_AUTH_LDAP_DOMAIN', 'subdomain.example.com'),
             'organisation' => env('REMOTE_AUTH_LDAP_ORGANISATION', 'OU=Organisation,DC=subdomain,DC=example,DC=com'),
             'dns' => env('REMOTE_AUTH_LDAP_DNS', 'subdomain.example.com'),
-            'class' => Ldap::class,
         ],
 
     ],

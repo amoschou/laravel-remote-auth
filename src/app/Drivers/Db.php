@@ -5,12 +5,8 @@ namespace AMoschou\RemoteAuth\App\Drivers;
 use AMoschou\RemoteAuth\App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-class Db extends Driver
+final class Db extends Driver
 {
-    public $driver = 'db';
-
-    public $usesHash = true;
-
     public function validate($username, $password): bool
     {
         return Auth::attempt([
@@ -19,7 +15,7 @@ class Db extends Driver
         ]);
     }
 
-    public function getUser($username, $password = null): array
+    protected function user($username, $password = null): array
     {
         return User::find($username)->getAboutUser();
     }

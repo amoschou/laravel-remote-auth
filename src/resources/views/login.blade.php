@@ -15,9 +15,6 @@
             <form method="post" action=" {{ route('login.post') }} ">
                 @csrf
 
-                <input type="hidden" name="hidden" />
-                @error('hidden') <p>{{ $errors->first('hidden') }}</p> @enderror
-
                 <p>
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" value="{{ old('username') }}" />

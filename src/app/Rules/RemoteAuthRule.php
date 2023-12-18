@@ -31,17 +31,18 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
 
         $password = $this->data['password'];
 
-        $credentials = [
-            'username' => $username,
-            'password' => $password,
-        ];
+        $failMessage = null;
 
-        if ($password === '' || $username === '' || is_null($username) || is_null($password)) {
-            $fail('No anonymous logins allowed.');
+        if (Str::of($username)->isEmpty() || Str::of($password)->isEmpty()) {
+            $failMessage = 'No anonymous logins allowed.';
         } else {
-            if (is_null($this->getDriver($credentials))) {
-                $fail('Unable to log in using this username/password at this time.');
+            if (is_null($this->getDriver($username, $password))) {
+                $failMessage = 'Unable to log in using this username/password at this time.';
             }
+        }
+
+        if (! is_null($failMessage)) {
+            $fail($failMessage);
         }
     }
 
@@ -57,18 +58,16 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         return $this;
     }
 
-    private function setDriver($credentials): void
+    private function setDriver($username, $password): void
     {
         if (is_null($this->driver)) {
-            $drivers = Driver::getOrderedList();
-
             $successfulDriver = null;
     
-            foreach($drivers as $driver) {
+            foreach(config('remote_auth.drivers') as $driverClass) {
                 try {
                     if (is_null($successfulDriver)) {
-                        if (Driver::select($driver)->validate($credentials['username'], $credentials['password'])) {
-                            $successfulDriver = $driver;
+                        if ((new $driverClass)->validate($username, $password)) {
+                            $successfulDriver = $driverClass;
                         }
                     }
                 } catch (\Throwable $t) {}
@@ -78,10 +77,18 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         }
     }
 
-    public function getDriver($credentials): string|null
+    // yes, used in LoginController
+    public function getDriver($username = null, $password = null): string|null
     {
-        $this->setDriver($credentials);
+        if (is_null($this->driver)) {
+            $this->setDriver($username, $password);
+        }
 
         return $this->driver;
+    }
+
+    public function getUser($username, $password)
+    {
+        return (new $this->driver)->getUser($username, $password);
     }
 }

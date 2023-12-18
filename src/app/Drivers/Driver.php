@@ -4,14 +4,21 @@ namespace AMoschou\RemoteAuth\App\Drivers;
 
 abstract class Driver
 {
-    public $driver;
-
+    // yes
     abstract public function validate($username, $password): bool;
 
-    abstract public function getUser($username, $password): array;
+    // yes
+    abstract protected function user($username, $password): array;
 
-    public $usesHash = false;
+    // yes
+    public function getUser($username, $password)
+    {
+        return $this->validate($username, $password)
+            ? $this->user()
+            : null;
+    }
 
+    // yes, used in Ldap.php
     public function dnsRecordExists(): bool
     {
         $domain = config("remote_auth.drivers.{$this->driver}.dns");
@@ -55,14 +62,5 @@ abstract class Driver
         $auth = new $driverClass;
 
         return $auth;
-    }
-
-    public static function getOrderedList(): array
-    {
-        $default = [config('remote_auth.default')];
-
-        $preferences = config('remote_auth.preferences');
-
-        return array_merge($default, $preferences);
     }
 }
