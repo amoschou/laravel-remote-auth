@@ -19,7 +19,7 @@ return [
 
     'drivers' => [
         'ldap' => Ldap::class,
-        'db' => DB::class,
+        'db' => Db::class,
     ],
 
     'settings' => [
