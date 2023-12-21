@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Http;
 
 class RemoteAuthRule implements DataAwareRule, ValidationRule
 {
+    /**
+     * The driver to validate against.
+     * 
+     * @var class-string
+     */
     private $driver;
 
     /**
@@ -35,10 +40,8 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
 
         if (Str::of($username)->isEmpty() || Str::of($password)->isEmpty()) {
             $failMessage = 'No anonymous logins allowed.';
-        } else {
-            if (is_null($this->getDriver($username, $password))) {
-                $failMessage = 'Unable to log in using this username/password at this time.';
-            }
+        } elseif (is_null($this->getDriver($username, $password))) {
+            $failMessage = 'Unable to log in using this username/password at this time.';
         }
 
         if (! is_null($failMessage)) {
@@ -58,6 +61,12 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         return $this;
     }
 
+    /**
+     * Set the driver to validate against.
+     * 
+     * @param  string  $username
+     * @param  string  $password
+     */
     private function setDriver($username, $password): void
     {
         if (is_null($this->driver)) {
@@ -77,7 +86,14 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         }
     }
 
-    // yes, used in LoginController
+    /**
+     * Get the driver to validate against.
+     * 
+     * @param  string|null  $username
+     * @param  string|null  $password
+     * 
+     * @return class-string
+     */
     public function getDriver($username = null, $password = null): string|null
     {
         if (is_null($this->driver)) {

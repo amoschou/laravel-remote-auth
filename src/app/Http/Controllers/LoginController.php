@@ -19,6 +19,11 @@ class LoginController extends Controller
 {
     private $remoteAuthRule;
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
     private function rules()
     {
         return [
@@ -58,11 +63,14 @@ class LoginController extends Controller
         return redirect(config('remote_auth.redirect.after_logout'));
     }
 
+    /**
+     * Validate the authentication attempt.
+     */
     private function validate(Request $request): array
     {
-        $upOnly = ['username', 'password'];
+        $keys = ['username', 'password'];
 
-        $upValidator = Validator::make(Arr::only($request->all(), $upOnly), Arr::only($this->rules(), $upOnly));
+        $upValidator = Validator::make(Arr::only($request->all(), $keys), Arr::only($this->rules(), $keys));
 
         $upValidated = $upValidator->validated();
 
@@ -73,6 +81,9 @@ class LoginController extends Controller
         return $validator->validated();
     }
 
+    /**
+     * Sync the user’s details from the remote server and get the user.
+     */
     private function prepareUser($username, $password): User
     {
         return DB::transaction(function () {

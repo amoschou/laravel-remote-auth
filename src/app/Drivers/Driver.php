@@ -4,10 +4,24 @@ namespace AMoschou\RemoteAuth\App\Drivers;
 
 abstract class Driver
 {
-    // yes
+    /**
+     * Decide whether the username and password are valid.
+     * 
+     * @param  string  $username
+     * @param  string  $password
+     * 
+     * @return bool
+     */
     abstract public function validate($username, $password): bool;
 
-    // yes
+    /**
+     * Find the user with the given username and password.
+     * 
+     * @param  string  $username
+     * @param  string|null  $password
+     * 
+     * @return array<string, mixed>
+     */
     abstract protected function user($username, $password): array;
 
     // yes

@@ -69,7 +69,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function isMemberOf($group)
+    /**
+     * Decide whether the user belongs to the group.
+     *
+     * @var string
+     * 
+     * @return bool
+     */
+    public function isMemberOf($group): bool
     {
         return DB::table('remote_auth_memberships')
             ->where('username', $this->username)
@@ -77,6 +84,13 @@ class User extends Authenticatable
             ->exists();
     }
 
+    /**
+     * Get the user’s details.
+     *
+     * @var string
+     * 
+     * @return array<string, string>
+     */
     public function getAboutUser()
     {
         $groups = DB::table('remote_auth_memberships')
