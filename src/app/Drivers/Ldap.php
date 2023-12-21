@@ -12,12 +12,10 @@ class Ldap extends Driver
             return false;
         }
 
-        $ldapAuth = new LdapSupport;
-
-        $ldapAuth->credentials($username, $password)
-            ->unbind();
-
-        return ! $ldapAuth->hasInvalidCredentials();
+        return ! (new LdapSupport)
+            ->credentials($username, $password)
+            ->unbind()
+            ->hasInvalidCredentials();
     }
 
     protected function user($username, $password): array
