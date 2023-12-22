@@ -70,6 +70,17 @@ class User extends Authenticatable
     ];
 
     /**
+     * Get the groups for the user.
+     */
+    public function getGroups()
+    {
+        return DB::table('remote_auth_memberships')
+            ->where('username', $this->username)
+            ->pluck('group')
+            ->toArray();
+    }
+    
+    /**
      * Decide whether the user belongs to a given group.
      *
      * @var string

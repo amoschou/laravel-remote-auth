@@ -26,6 +26,11 @@ abstract class Driver
      */
     abstract protected function user($username, $password): array;
 
+    private function key()
+    {
+        return array_flip(config('remote_auth.drivers'))[static::class];
+    }
+
     // yes
     public function getUser($username, $password)
     {
@@ -37,7 +42,7 @@ abstract class Driver
     // yes, used in Ldap.php
     public function dnsRecordExists(): bool
     {
-        $domain = config("remote_auth.drivers.{$this->driver}.dns");
+        $domain = config("remote_auth.settings.{$this->key()}.dns");
 
         return checkdnsrr($domain, 'A');
     }
@@ -73,7 +78,7 @@ abstract class Driver
 
     private static function as($driver)
     {
-        $driverClass = config("remote_auth.drivers.{$driver}.class");
+        $driverClass = config("remote_auth.settings.{$this->key()}.class");
 
         $auth = new $driverClass;
 
