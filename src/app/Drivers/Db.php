@@ -25,9 +25,9 @@ final class Db extends Driver
     }
 
     /**
-     * Get a set of details about the user for the given username and password.
-     * The Db driver does not connect to a remote server and any updates will
-     * not be synced. Whatever is already in the database gets retrieved.
+     * Get the details about the user for the given username and password. This
+     * driver does not connect to a remote server and any updates will not be
+     * synced. Whatever is already in the database is what gets retrieved.
      * 
      * @param  string  $username
      * @param  string|null  $password
