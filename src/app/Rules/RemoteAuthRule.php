@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class RemoteAuthRule implements DataAwareRule, ValidationRule
 {
