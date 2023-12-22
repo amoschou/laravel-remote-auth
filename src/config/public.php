@@ -13,7 +13,7 @@ return [
     |
     | Authentication is first attempted using the first driver in the list. In
     | case this fails, the next is tried and so on until one is successful.
-    | Any setting that a driver may require can be configured as well. 
+    | Any setting that a driver may require can be configured as well.
     |
     */
 

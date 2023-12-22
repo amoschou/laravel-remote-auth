@@ -38,7 +38,7 @@ class LoginController extends Controller
      */
     public function authenticate(Request $request): RedirectResponse
     {
-        $validated = $this->validate($request);
+        $validated = $this->validateAuthenticationRequest($request);
 
         $user = $this->syncUser($validated['username'], $validated['password']);
 
@@ -68,7 +68,7 @@ class LoginController extends Controller
      * validated according to the rules array. They are then used to select a
      * driver and are then validated further against the remote server.
      */
-    private function validate(Request $request): array
+    private function validateAuthenticationRequest(Request $request): array
     {
         $keys = ['username', 'password'];
 

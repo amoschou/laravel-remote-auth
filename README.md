@@ -87,12 +87,12 @@ The DB driver is designed to be used as a backup, in case the LDAP (or other ext
    use AMoschou\RemoteAuth\App\Http\Controllers\LoginController;
 
    Route::middleware('guest')->group(function () {
-       Route::get('/login', function () { return view('vendor.laravel-remote-auth.login'); })->name('login');
-       Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
+       Route::get('/auth/login', function () { return view('vendor.laravel-remote-auth.login'); })->name('login');
+       Route::post('/auth/login', [LoginController::class, 'authenticate'])->name('login.post');
    });
 
    Route::middleware('auth')->group(function () {
-       Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+       Route::get('/auth/logout', [LoginController::class, 'logout'])->name('logout');
        Route::get('/home', function () { return view('home'); })->name('home');
    });
    ```
