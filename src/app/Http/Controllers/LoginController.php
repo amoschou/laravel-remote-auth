@@ -97,8 +97,6 @@ class LoginController extends Controller
         $aboutUser = (new ($this->remoteAuthRule->getDriver()))->getUser($username, $password);
 
         return DB::transaction(function () use ($aboutUser) {
-            $aboutUser = $this->remoteAuthRule->getDriver()->getUser($username, $password);
-
             $aboutUser['username'] = strtolower($aboutUser['username']);
 
             $user = User::findOr($aboutUser['username'], function () use ($aboutUser) {
