@@ -70,7 +70,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Decide whether the user belongs to the group.
+     * Decide whether the user belongs to a given group.
      *
      * @var string
      * 

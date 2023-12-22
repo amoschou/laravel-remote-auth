@@ -6,21 +6,21 @@ use AMoschou\RemoteAuth\App\Drivers\Driver;
 use AMoschou\RemoteAuth\App\Rules\RemoteAuthRule;
 use AMoschou\RemoteAuth\App\Support\LdapAuth;
 use AMoschou\RemoteAuth\App\Models\User;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Http\{RedirectResponse, Request};
+use Illuminate\Support\Facades\{Auth, DB, Hash, Validator};
+use Illuminate\Support\{Arr, Str};
 
 class LoginController extends Controller
 {
+    /**
+     * The validation rule that validates a given username and password against
+     * the remote server. This is referenced here, once a driver has been
+     * selected, as it is used at multiple parts of the login process. 
+     */
     private $remoteAuthRule;
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get the validation rules that apply to the authentication attempt.
      *
      * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
@@ -40,7 +40,7 @@ class LoginController extends Controller
     {
         $validated = $this->validate($request);
 
-        $user = $this->prepareUser($validated['username'], $validated['password']);
+        $user = $this->syncUser($validated['username'], $validated['password']);
 
         Auth::login($user, $request->boolean('remember'));
 
@@ -64,27 +64,35 @@ class LoginController extends Controller
     }
 
     /**
-     * Validate the authentication attempt.
+     * Validate the authentication attempt. The username and password are first
+     * validated according to the rules array. They are then used to select a
+     * driver and are then validated further against the remote server.
      */
     private function validate(Request $request): array
     {
         $keys = ['username', 'password'];
 
-        $upValidator = Validator::make(Arr::only($request->all(), $keys), Arr::only($this->rules(), $keys));
+        $credValidator = Validator::make(
+            Arr::only($request->all(), $keys),
+            Arr::only($this->rules(), $keys)
+        );
 
-        $upValidated = $upValidator->validated();
+        $credentials = $credValidator->validated();
 
-        $this->remoteAuthRule = (new RemoteAuthRule)->setDriver($upValidated['username'], $upValidated['password']);
+        $this->remoteAuthRule = (new RemoteAuthRule)->setDriver($credentials['username'], $credentials['password']);
 
-        $validator = Validator::make(Arr::add($request->all(), '_remote_auth_rule', null), $this->rules());
+        $validator = Validator::make(
+            Arr::add($request->all(), '_remote_auth_rule', null),
+            $this->rules()
+        );
 
         return $validator->validated();
     }
 
     /**
-     * Sync the user’s details from the remote server and get the user.
+     * Sync the user’s details from the remote server and get the user model.
      */
-    private function prepareUser($username, $password): User
+    private function syncUser($username, $password): User
     {
         return DB::transaction(function () {
             $aboutUser = $this->remoteAuthRule->getDriver()->getUser($username, $password);

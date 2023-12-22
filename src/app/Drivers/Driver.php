@@ -5,17 +5,19 @@ namespace AMoschou\RemoteAuth\App\Drivers;
 abstract class Driver
 {
     /**
-     * Decide whether the username and password are valid.
+     * Determine whether the username and password can authenticate against
+     * this driver.
      * 
      * @param  string  $username
      * @param  string  $password
      * 
      * @return bool
      */
-    abstract public function validate($username, $password): bool;
+    abstract public function attempt($username, $password): bool;
 
     /**
-     * Find the user with the given username and password.
+     * Get a newly synced set of details about the user for the given username
+     * and password.
      * 
      * @param  string  $username
      * @param  string|null  $password

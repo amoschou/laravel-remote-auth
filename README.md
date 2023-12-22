@@ -14,7 +14,7 @@ This package provides two drivers:
 
 The LDAP driver is appropriate if your organisation already uses an LDAP server. Users submit their username and password, and these are used to attempt authentication to the LDAP server. The app receives the result of this attempt as success or fail. If successful, a second request is also made to receive information about the user which includes their name, email address and ID number, and this information is stored in the app’s database. If this information has been changed on the LDAP server since the previous login, updates will be reflected in the app. The user’s hashed password is also stored in the database. Usually, this would not be used, but it is necessary for the DB driver to work.
 
-The DB driver is designed to be used as a backup, in case the LDAP (or other external) server is unavailable. Users submit their username and password, and these are checked in the app’s database like a traditional username/password system. As this requires the hashed password to exist in the database, a user must have logged in at some point previously using the external server driver. As the external server is unavailable at this login session, any changes which might exist about the user (name, email, etc) on the external server since the preivous successful login attempt will not be reflected in the app.
+The DB driver is designed to be used as a backup, in case the LDAP (or other external) server is unavailable. Users submit their username and password, and these are checked in the app’s database like a traditional username/password system. As this requires the hashed password to exist in the database, a user must have logged in at some point previously using the external server driver. As the external server is unavailable at this login session, any changes which might exist about the user (name, email, etc) on the external server since the preivous successful login attempt will not yet be synced in the app.
 
 ## Getting started
 
@@ -82,7 +82,7 @@ The DB driver is designed to be used as a backup, in case the LDAP (or other ext
    </form>
    ```
 
-6. Typically, you will need a route to show this form, and route to receive the login request. This package does not provide any routes, you must define them yourself in `routes/web.php`. In this setup, we also need a home route to redirect requests to after logging in, and a log out route. You will need to use the `authenticate` and `logout` methods on `LoginController`, but generally, you are free to design your routes and views as you like.
+6. Typically, you will need a route to show this form, and route to receive the login request. This package does not provide any routes, you must define them yourself in `routes/web.php`. In this setup, we also need a home route to redirect requests to after logging in, and a log out route. You will need to use the `authenticate` and `logout` methods on `LoginController` and appropriate middleware, but generally, you are free to design your routes and views as you like.
    ```
    use AMoschou\RemoteAuth\App\Http\Controllers\LoginController;
 
@@ -109,11 +109,19 @@ use AMoschou\RemoteAuth\App\Drivers\Driver;
 
 class NewAuth extends Driver
 {
+    /**
+     * Determine whether the username and password can authenticate against
+     * this driver.
+     */
     public function validate($username, $password): bool
     {
         // Returns true for valid credentials or false if invalid.
     }
 
+    /**
+     * Get a newly synced set of details about the user for the given username
+     * and password.
+     */
     protected function user($username, $password): array
     {
         // Returns an array of the following form:

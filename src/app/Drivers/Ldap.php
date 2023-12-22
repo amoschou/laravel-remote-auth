@@ -7,14 +7,15 @@ use AMoschou\RemoteAuth\App\Support\Ldap as LdapSupport;
 class Ldap extends Driver
 {
     /**
-     * Decide whether the username and password are valid.
+     * Determine whether the username and password can authenticate against
+     * this driver.
      * 
      * @param  string  $username
      * @param  string  $password
      * 
      * @return bool
      */
-    public function validate($username, $password): bool
+    public function attempt($username, $password): bool
     {
         if (! $this->dnsRecordExists()) {
             return false;
@@ -27,7 +28,8 @@ class Ldap extends Driver
     }
 
     /**
-     * Find the user with the given username and password.
+     * Get a newly synced set of details about the user for the given username
+     * and password.
      * 
      * @param  string  $username
      * @param  string  $password

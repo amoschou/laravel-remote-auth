@@ -50,43 +50,6 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
     }
 
     /**
-     * Set the data under validation.
-     *
-     * @param  array<string, mixed>  $data
-     */
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Set the driver to validate against.
-     * 
-     * @param  string  $username
-     * @param  string  $password
-     */
-    private function setDriver($username, $password): void
-    {
-        if (is_null($this->driver)) {
-            $successfulDriver = null;
-    
-            foreach(config('remote_auth.drivers') as $driverClass) {
-                try {
-                    if (is_null($successfulDriver)) {
-                        if ((new $driverClass)->validate($username, $password)) {
-                            $successfulDriver = $driverClass;
-                        }
-                    }
-                } catch (\Throwable $t) {}
-            }
-    
-            $this->driver = $successfulDriver;
-        }
-    }
-
-    /**
      * Get the driver to validate against.
      * 
      * @param  string|null  $username
@@ -101,6 +64,41 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
         }
 
         return $this->driver;
+    }
+
+    /**
+     * Set the driver to validate against.
+     * 
+     * @param  string  $username
+     * @param  string  $password
+     */
+    private function setDriver($username, $password): void
+    {
+        $successfulDriver = null;
+
+        foreach(config('remote_auth.drivers') as $driverClass) {
+            try {
+                if (is_null($successfulDriver)) {
+                    if ((new $driverClass)->attempt($username, $password)) {
+                        $successfulDriver = $driverClass;
+                    }
+                }
+            } catch (\Throwable $t) {}
+        }
+
+        $this->driver = $successfulDriver;
+    }
+
+    /**
+     * Set the data under validation.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function setData(array $data): static
+    {
+        $this->data = $data;
+
+        return $this;
     }
 
     public function getUser($username, $password)
