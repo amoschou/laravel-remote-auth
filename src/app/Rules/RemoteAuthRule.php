@@ -72,7 +72,7 @@ class RemoteAuthRule implements DataAwareRule, ValidationRule
      * @param  string  $username
      * @param  string  $password
      */
-    public function setDriver($username, $password): void
+    public function setDriver($username, $password): RemoteAuthRule
     {
         $successfulDriver = null;
 
