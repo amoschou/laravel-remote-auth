@@ -34,7 +34,7 @@ abstract class Driver
     // yes
     public function getUser($username, $password)
     {
-        return $this->validate($username, $password)
+        return $this->attempt($username, $password)
             ? $this->user()
             : null;
     }

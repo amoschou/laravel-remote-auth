@@ -94,7 +94,9 @@ class LoginController extends Controller
      */
     private function syncUser($username, $password): User
     {
-        return DB::transaction(function () {
+        $aboutUser = (new ($this->remoteAuthRule->getDriver()))->getUser($username, $password);
+
+        return DB::transaction(function () use ($aboutUser) {
             $aboutUser = $this->remoteAuthRule->getDriver()->getUser($username, $password);
 
             $aboutUser['username'] = strtolower($aboutUser['username']);
