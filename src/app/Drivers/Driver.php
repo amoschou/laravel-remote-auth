@@ -35,7 +35,7 @@ abstract class Driver
     public function getUser($username, $password)
     {
         return $this->attempt($username, $password)
-            ? $this->user()
+            ? $this->user($username, $password)
             : null;
     }
 
