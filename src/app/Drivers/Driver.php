@@ -26,7 +26,7 @@ abstract class Driver
      */
     abstract protected function user($username, $password): array;
 
-    private function key()
+    protected function key()
     {
         return array_flip(config('remote_auth.drivers'))[static::class];
     }

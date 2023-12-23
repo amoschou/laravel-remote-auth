@@ -2,6 +2,8 @@
 
 namespace AMoschou\RemoteAuth\App\Support;
 
+use AMoschou\RemoteAuth\App\Drivers\Ldap as LdapDriver;
+
 class Ldap
 {
     private static $justthese = [
@@ -28,7 +30,9 @@ class Ldap
     {
         $this->username = $username;
 
-        $domain = config('remote_auth.drivers.ldap.domain');
+        $driverKey = LdapDriver::key();
+
+        $domain = config("remote_auth.settings.{$driverKey}.domain");
 
         $this->userPrincipalName = "{$username}@{$domain}";
 
@@ -38,7 +42,9 @@ class Ldap
     private function getConnection()
     {
         if (is_null($this->connection)) {
-            $this->connection = ldap_connect(config('remote_auth.drivers.ldap.connection'));
+            $driverKey = LdapDriver::key();
+
+            $this->connection = ldap_connect(config("remote_auth.settings.{$driverKey}.connection"));
 
             $this->invalidCredentials = false;
         }
@@ -96,9 +102,11 @@ class Ldap
 
         $filter = "(samaccountname={$username})";
 
+        $driverKey = LdapDriver::key();
+
         $search = ldap_search(
             $this->getConnection(),
-            config('remote_auth.drivers.ldap.organisation'),
+            config("remote_auth.settings.{$driverKey}.organisation"),
             $filter,
             self::$justthese
         );
