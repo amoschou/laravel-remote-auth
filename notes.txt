@@ -1,0 +1,21 @@
+In the future, we might include something like the following:
+
+private function checkServer()
+{
+    // Return false if there is any reason that this remote server would not work.
+    // Maybe it is unreachable, maybe it is misconfigured. Return true otherwise.
+
+    $domain = $this->config('domain');
+
+    if (is_null($domain)) {
+        return true;
+    }
+
+    return checkdnsrr($domain, 'A');
+}
+
+private function ifCanReachServer()
+{
+    return $this->serverIsUnreachable ? null : $this;
+}
+

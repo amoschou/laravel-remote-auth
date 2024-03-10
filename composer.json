@@ -1,0 +1,31 @@
+{
+    "name": "amoschou/laravel-remote-auth",
+    "description": "Authentication provided by remote servers for Laravel apps.",
+    "homepage": "https://github.com/amoschou/laravel-remote-auth",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "amoschou",
+            "email": "4948673+amoschou@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^10.10",
+        "league/csv": "^9.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "AMoschou\\RemoteAuth\\": "src/",
+            "AMoschou\\RemoteAuth\\App\\": "src/app/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AMoschou\\RemoteAuth\\App\\Providers\\ServiceProvider"
+            ]
+        }
+    }
+}
