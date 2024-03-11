@@ -162,7 +162,7 @@ class LoginController extends Controller
                 $user->save();
             }
 
-            $groups = $profile['groups'] ?? [];
+            $groups = $record->profile['groups'] ?? [];
 
             DB::table('remote_auth_memberships')
                 ->where('username', $username)
