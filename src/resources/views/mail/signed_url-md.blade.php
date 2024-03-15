@@ -11,7 +11,7 @@ If clicking link does not work, copy and paste the following:
 
 **{{ $link }}**
 
-This link expires in {{ $minutes }} minutes. Do not share it with anyone else.
+This link expires in {{ $expire }} minutes. Do not share it with anyone else.
 
 Regards,\
 {{ $app }}

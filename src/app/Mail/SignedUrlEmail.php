@@ -15,14 +15,16 @@ class SignedUrlEmail extends Mailable
 
     private $name;
     private $link;
+    private $expire;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($name, $link)
+    public function __construct($name, $link, $expire)
     {
         $this->name = $name;
         $this->link = $link;
+        $this->expire = $expire;
     }
 
     /**
@@ -47,6 +49,7 @@ class SignedUrlEmail extends Mailable
                 'app' => config('app.name'),
                 'name' => $this->name,
                 'link' => $this->link,
+                'expire' => $this->expire,
             ],
         );
     }

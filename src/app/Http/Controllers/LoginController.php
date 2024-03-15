@@ -50,7 +50,7 @@ class LoginController extends Controller
 
             $email = User::find($username)->email;
 
-            Mail::to($email)->send(new SignedUrlEmail($username, $signedUrl));
+            Mail::to($email)->send(new SignedUrlEmail($username, $signedUrl, $minutes));
 
             return view('remote-auth::mail.signed_url-confirmation', [
                 'username' => $username,
