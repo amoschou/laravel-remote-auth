@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "laravel/framework": "^10.10",
+        "laravel/framework": "^11.0",
         "league/csv": "^9.14"
     },
     "autoload": {
